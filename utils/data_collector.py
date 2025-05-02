@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import os
 
 def scrape_competitor():
     """
@@ -13,7 +14,9 @@ def scrape_competitor():
     }
 
     try:
-        response = requests.get(url, headers=headers)
+        session = requests.Session()
+        session.headers.update(headers)
+        response = session.get(url)
         response.raise_for_status()  # Raise an error for bad responses
         soup = BeautifulSoup(response.content, "html.parser")
 
@@ -36,21 +39,20 @@ def scrape_competitor():
 
 def fetch_internal_data():
     """
-    Fetches internal data from your database or API.
+    Fetches internal data from a local JSON file.
     Example: Current prices, inventory, loyalty metrics, etc.
     """
-    # Simulated internal API endpoint
-    internal_api_url = "https://api.yourcompany.com/internal-data"  # Replace with your actual API
-    headers = {"Authorization": "Bearer YOUR_API_KEY"}  # Replace with your API key
-
     try:
-        response = requests.get(internal_api_url, headers=headers)
-        response.raise_for_status()
-        data = response.json()
+        # Path to the internal data file
+        file_path = os.path.join(os.path.dirname(__file__), "../internal_data.json")
 
-        # Example: Extract relevant fields
+        # Read the JSON file
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
+        # Extract relevant fields
         return {
-            "current_price": data.get("price"),
+            "current_price": data.get("current_price"),
             "inventory": data.get("inventory"),
             "loyalty_percentage": data.get("loyalty_percentage"),
             "delivery_time": data.get("delivery_time"),
