@@ -1,44 +1,41 @@
-import json
-from utils.data_collector import collect_all_data
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+import time
 
-def validate_data(data):
-    issues = []
+def fetch_competitor_data():
+    options = Options()
+    options.add_argument('--headless')  # Silent mode
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 
-    competitor = data.get("competitor_data", {})
-    internal = data.get("internal_data", {})
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    driver.get("https://naivas.online/")
+    time.sleep(5)  # Wait for JS to load
 
-    if not competitor.get("store_name"):
-        issues.append("❌ Missing store_name")
+    try:
+        store_name = "Naivas Supermarket Nakuru Super Centre"
 
-    if not competitor.get("address"):
-        issues.append("❌ Missing address")
+        # Update these selectors as needed
+        address = driver.find_element(By.CSS_SELECTOR, "footer div[class*='address']").text
+        promo_banner = driver.find_element(By.CSS_SELECTOR, "div[class*='promo'], div[class*='banner']").text
 
-    if not competitor.get("promotion"):
-        issues.append("❌ Missing promotion")
+        return {
+            "store_name": store_name,
+            "address": address,
+            "promotion": promo_banner,
+            "source": "competitor_website"
+        }
 
-    if not internal.get("current_price"):
-        issues.append("❌ Missing current_price")
-
-    if not internal.get("inventory"):
-        issues.append("❌ Missing inventory")
-
-    return issues
-
-if __name__ == "__main__":
-    # Collect data
-    data = collect_all_data()
-
-    # Print raw output
-    print("📦 Raw Output:\n")
-    print(json.dumps(data, indent=4))
-
-    # Run validations
-    print("\n🔍 Validation Report:\n")
-    issues = validate_data(data)
-
-    if issues:
-        for issue in issues:
-            print(issue)
-    else:
-        print("✅ All fields populated.")
+    except Exception as e:
+        print(f"Scraping error: {e}")
+        return {
+            "store_name": store_name,
+            "address": None,
+            "promotion": None,
+            "source": "competitor_website"
+        }
+    finally:
+        driver.quit()
 
