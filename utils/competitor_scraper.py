@@ -8,26 +8,25 @@ def fetch_competitor_data():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                       "(KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive"
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5"
     }
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        store_element = soup.find("h1")
-        store_name = store_element.get_text(strip=True) if store_element else store_name
+        # Extract Address
+        address_element = soup.find(lambda tag: tag.name in ['h2', 'h3', 'p'] and 'located in' in tag.text.lower())
+        address = address_element.get_text(strip=True).replace('\n', ' ') if address_element else "Unavailable"
 
-        address_element = soup.select_one("div.elementor-widget-container p")
-        address = address_element.get_text(strip=True) if address_element else None
-
+        # Extract Promotion Text
         promo_element = soup.find(lambda tag: tag.name in ['h2', 'p'] and 'offer' in tag.text.lower())
-        promotion = promo_element.get_text(strip=True) if promo_element else None
+        if not promo_element:
+            # Fallback to any paragraph with promotional tone
+            promo_element = soup.find(lambda tag: tag.name == 'p' and 'selection' in tag.text.lower())
+        promotion = promo_element.get_text(strip=True).replace('\n', ' ') if promo_element else "Unavailable"
 
         return {
             "store_name": store_name,
@@ -40,8 +39,8 @@ def fetch_competitor_data():
         print(f"❌ Error scraping competitor: {e}")
         return {
             "store_name": store_name,
-            "address": None,
-            "promotion": None,
+            "address": "Unavailable",
+            "promotion": "Unavailable",
             "source": url
         }
 
