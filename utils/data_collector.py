@@ -6,9 +6,9 @@ import os
 def scrape_competitor():
     """
     Scrapes live competitor data from their website.
-    Example: Extracts product prices, promotions, and delivery info.
+    Example: Extracts store name, address, and any visible promotions.
     """
-    url = "https://naivas.info/locations/naivas-supercentre-nakuru/"  # Replace with the actual URL
+    url = "https://naivas.info/locations/naivas-supercentre-nakuru/"  # Competitor's URL
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
@@ -20,16 +20,21 @@ def scrape_competitor():
         response.raise_for_status()  # Raise an error for bad responses
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # Example: Extract price
-        price_element = soup.find("span", class_="price")  # Adjust based on HTML structure
-        price = float(price_element.text.strip().replace("$", "")) if price_element else None
+        # Example: Extract store name
+        store_name_element = soup.find("h1", class_="entry-title")  # Adjust based on HTML structure
+        store_name = store_name_element.text.strip() if store_name_element else None
 
-        # Example: Extract promotions (e.g., banners)
+        # Example: Extract store address
+        address_element = soup.find("div", class_="address")  # Adjust based on HTML structure
+        address = address_element.text.strip() if address_element else None
+
+        # Example: Extract promotions (if available)
         promotion_element = soup.find("div", class_="promotion-banner")
         promotion = promotion_element.text.strip() if promotion_element else None
 
         return {
-            "price": price,
+            "store_name": store_name,
+            "address": address,
             "promotion": promotion,
             "source": "competitor_website",
         }
