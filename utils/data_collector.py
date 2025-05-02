@@ -8,7 +8,7 @@ def scrape_competitor():
     Scrapes live competitor data from their website.
     Example: Extracts product prices, promotions, and delivery info.
     """
-    url = "https://competitor.com/pricing"  # Replace with the actual URL
+    url = "https://naivas.info/locations/naivas-supercentre-nakuru/"  # Replace with the actual URL
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
