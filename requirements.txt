@@ -3,6 +3,6 @@ fastapi
 uvicorn
 requests
 beautifulsoup4
-
+selenium
 # Future dependencies (for GPT reasoning)
 openai
