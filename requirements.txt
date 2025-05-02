@@ -1,0 +1,8 @@
+# Core dependencies
+fastapi
+uvicorn
+requests
+beautifulsoup4
+
+# Future dependencies (for GPT reasoning)
+openai
