@@ -1,41 +1,58 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-import time
+import json
+from utils.data_collector import collect_all_data
 
-def fetch_competitor_data():
-    options = Options()
-    options.add_argument('--headless')  # Silent mode
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+def validate_data(data):
+    issues = []
 
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-    driver.get("https://naivas.online/")
-    time.sleep(5)  # Wait for JS to load
+    competitor = data.get("competitor_data", {})
+    internal = data.get("internal_data", {})
+
+    if not competitor.get("store_name"):
+        issues.append("❌ Missing store_name")
+
+    if not competitor.get("address"):
+        issues.append("❌ Missing address")
+
+    if not competitor.get("promotion"):
+        issues.append("❌ Missing promotion")
+
+    if "source" not in competitor or not competitor.get("source"):
+        issues.append("❌ Missing source info")
+
+    if "current_price" not in internal:
+        issues.append("❌ Missing current_price")
+
+    if "inventory" not in internal:
+        issues.append("❌ Missing inventory")
+
+    if "loyalty_percentage" not in internal:
+        issues.append("❌ Missing loyalty_percentage")
+
+    if "delivery_time" not in internal:
+        issues.append("❌ Missing delivery_time")
+
+    return issues
+
+if __name__ == "__main__":
+    print("🧠 Running Gill Data Collector Test...\n")
 
     try:
-        store_name = "Naivas Supermarket Nakuru Super Centre"
+        print("⚙️ Collecting data...")
+        data = collect_all_data()
 
-        # Update these selectors as needed
-        address = driver.find_element(By.CSS_SELECTOR, "footer div[class*='address']").text
-        promo_banner = driver.find_element(By.CSS_SELECTOR, "div[class*='promo'], div[class*='banner']").text
+        print("\n📦 Raw Output:\n")
+        print(json.dumps(data, indent=4))
 
-        return {
-            "store_name": store_name,
-            "address": address,
-            "promotion": promo_banner,
-            "source": "competitor_website"
-        }
+        print("\n🔍 Validation Report:\n")
+        issues = validate_data(data)
+
+        if issues:
+            for issue in issues:
+                print(issue)
+        else:
+            print("✅ All fields populated successfully.")
 
     except Exception as e:
-        print(f"Scraping error: {e}")
-        return {
-            "store_name": store_name,
-            "address": None,
-            "promotion": None,
-            "source": "competitor_website"
-        }
-    finally:
-        driver.quit()
+        print("❌ An unexpected error occurred:")
+        print(str(e))
 
