@@ -5,6 +5,8 @@ requests
 beautifulsoup4
 selenium
 selenium webdriver-manager
+requests
+beautifulsoup4
 
-# Future dependencies (for GPT reasoning)
+Future dependencies (for GPT reasoning)
 openai
