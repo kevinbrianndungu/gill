@@ -1,9 +1,26 @@
-# Core dependencies
+# Web framework
 fastapi
 uvicorn
+
+# HTTP requests and scraping
 requests
 beautifulsoup4
+lxml
 selenium
-requests
-beautifulsoup4
+
+# Voice assistant
+pyttsx3                 # Text-to-speech
+SpeechRecognition       # Speech-to-text
+pyaudio                 # Required by SpeechRecognition
+
+# Data processing & validation
+python-dotenv           # For loading config variables
+pydantic                # Used with FastAPI schemas (if needed)
+
+# Analytics
+numpy
+pandas
+
+# Testing (optional but good for test coverage)
+pytest
 
